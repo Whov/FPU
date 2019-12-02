@@ -8,13 +8,13 @@ integer, parameter :: N=32 ! # oscillatori
 real*8, parameter :: alpha = 0.25 ! costante nonlineare
 !integer, parameter :: nmis = 1000 ! numero di misure
 !integer, parameter :: DT = 20 ! tempo fra una misura e l'altra
-integer, parameter :: iterazioni = 4500 ! temporaneamente, numero di iterazioni
+integer, parameter :: iterazioni = 10000 ! temporaneamente, numero di iterazioni
 real*8, parameter :: dt = 0.01 ! intervallo di tempo fra uno step e il seguente
 real*8 chain(N) ! catena di particelle, registro i displacement
 real*8 chainD(N) ! catena di particelle, registro le velocità
 real*8 support(3) ! serve per registrare i displacement per calcolare lo step successivo
 integer iter,i
-
+real*8 energiaK, energiaP
 
 ! setup del lattice
 chain = 0.
@@ -31,6 +31,8 @@ do iter=1, iterazioni
 		support(2) = chain(i)
 		support(3) = chain(i+1)
 		!ricalcola p
+		! TODO!!!
+		! Per ora ci sono solo i termini lineari nell'interazione
 		chainD(i) = chainD(i) - dt * (2*support(2)-support(1)-support(3))
 		!salva la posizione del centrale attuale come quello a sinistra del passo dopo
 		support(1) = chain(i)
@@ -44,10 +46,19 @@ do iter=1, iterazioni
 	chain(N) = chain(N) + dt * chainD(N)
 	! fine aggiornamento reticolo
 	if (modulo(iter, 50) == 0) then
-		write(*,*) "Test", iter
+		energiaK = 0.
+		energiaP = 0.
 		do i=1, N
-			write(iter/50 + 6,*) chain(i)
+			!write(iter/50 + 6,*) chain(i)
+			!energia cinetica
+			energiaK = energiaK + 0.5 * chainD(i) * chainD(i)
 		enddo
+		!energia potenziale
+		do i=1, N-1
+			energiaP = energiaP + 0.5 * (chain(i+1) - chain(i))*(chain(i+1) - chain(i))
+		enddo
+		energiaP = energiaP + 0.5 * (chain(1) - chain(N))*(chain(1) - chain(N))
+		write(1,*) energiaK, energiaP, energiaK+energiaP
 	endif
 enddo
 
