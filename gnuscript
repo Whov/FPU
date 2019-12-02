@@ -1,0 +1,7 @@
+set terminal png
+do for [i=1:90] {
+	set yrange [-1.2:1.2]
+	name = sprintf("%02i.png", i)
+	set output name
+	plot 'fort.'.(i+6) w l title "F".i
+}
