@@ -1,7 +1,7 @@
 set terminal png
-do for [i=1:90] {
+do for [i=1:9000] {
 	set yrange [-1.2:1.2]
-	name = sprintf("%02i.png", i)
+	name = sprintf("%04i.png", i)
 	set output name
-	plot 'fort.'.(i+6) w l title "F".i
+	plot 'fort.'.(i+6) using 1 w l title "F".i#, 'fort.'.(i+6) using 2 w l title "E".i
 }
